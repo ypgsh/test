@@ -1,0 +1,6 @@
+.idea/
+venv/
+migrations/
+data/
+*.pyc
+!test/data
