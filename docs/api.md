@@ -614,27 +614,7 @@ method: GET
 ```
 - 请求参数：
 
-*-* 说明：
-
-| 名称         | 类型    | 说明                               | 是否必填   | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ | ------ |
-| name   | integer | 参数名 |  是   | 配气方式 | 
-| var_name   | string | 参数变量 | 是    | gov_mode | 
-| symbol   | string | 符号 | 否    | P | 
-| unit   | string | 单位 | 否    |  |
-| value_type   | string | 值类型 | 是 | integer |
-
-*-* 示例
-
-```json
-{
-    "name": "配气方式",
-    "var_name": "gov_mode",
-    "symbol": "P",
-    "unit":"m",
-    "value_type":"integer"
-}
-```
+  NA
 
 - 返回参数：
 
@@ -686,6 +666,68 @@ method: POST
 | input   | object | 输入方式等信息 |  是   |  |
 | performance   |  object| 页面行为 |  是   |  |
 | depend_attrs  | array | 依赖参数 | 否    |  |
+| comments  | object | 备注 | 否    |  |
+
+input解释
+```
+- 数据表
+{
+  "input_from": "table",
+  "table_name": "abc",  
+  "display_field":["abc"], # 展示那些字段 
+  "select_field":"abc",    # 选中时取那一列的值
+  "addition_value":[{"var_name": "def",  # 选中时,同时记录那些数据
+                      "name"; "呵呵"
+                     "select_field": "def"}
+                     ]
+  }
+  
+- 函数计算
+{
+    "input_from": "function",
+    "function_name": "calc_len"
+}
+
+- 表达式计算
+{
+    "input_from": "expression",
+    "expression_content": "3.14 * {abc}"
+}
+
+- 用户直接输入
+{
+    "input_from": "user_input"
+}
+
+- 值已经有了, 不需要填也不需要算,直接呈现
+{
+    "input_from": "auto_fill"
+}
+```
+
+performance解释
+```
+{
+    "hide": True, # 可见
+    "widget": "drop_list",   # drop_list / input /PopupWindow控件
+    "editable": True, # 状态
+    "update_trigger" = "user_click" # auto/user_click 更新触发
+    "validate":{          #验证
+                "constrain"": {min:0, max: 120}, # 验证条件 
+                "alert": "PopupWindow"  # 提醒方式
+                }
+}
+            
+```
+
+comments解释
+```
+{
+    "has_comments": True,
+    "source": "internal" #备注来源, 内部的提供变量名, 外部的直接数输入字符串
+    "relate_val_name": "gov_mode" # 内部变量名
+}
+```
 
 *-* 示例
 
@@ -785,7 +827,7 @@ method: GET
 ## 2.4
 获取某表单属性列表
 ```
-url: /api/sec_valve/v1/form/<int:form_id>/attrs
+url: /api/sec_valve/v1/forms/<int:form_id>/attrs
 method: GET	
 ```
 - 请求参数：
@@ -844,7 +886,9 @@ method: GET
 *-* 示例
 
 ```json
-{
+ {  "api_standard": "1.0",
+    "code":0,
+    "data":{
     "form_id":1,
     "attr_id":1,
     "input":{
@@ -862,9 +906,54 @@ method: GET
                     "editable": true 
                     },
     "depend_attrs": ["gov_mode1"]
+  }
+}
+
+```
+
+## 2.6
+获取修改参数属性
+```
+url: /api/sec_valve/v1/attrs/<int:attr_id>
+method: PATCH	
+```
+- 请求参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 是否必填   | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ | ------ |
+| name   | integer | 参数名 |  是   | 配气方式 |
+| symbol   | string | 符号 | 否    | P | 
+| unit   | string | 单位 | 否    |  |
+| value_type   | string | 值类型 | 是 | integer |
+
+*-* 示例
+
+```json
+{
+    "name": "配气方式",
+    "symbol": "P",
+    "unit":"m",
+    "value_type":"integer"
 }
 ```
 
+- 返回参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ |
+| code   | number | 操作结果 |      |
+*-* 示例
+
+```json
+{  "api_standard": "1.0",
+    "code": 0
+}
+
+```
 
 # 三 自定义函数相关
 ## 3.1 创建函数
@@ -1236,6 +1325,56 @@ method: GET
 | 名称         | 类型    | 说明                               | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ |
 | data   |   | 返回值 |      |
+
+*-* 示例
+
+```json
+{
+    "api_standard": "1.0",
+    "code":0,
+    "data": ""
+}
+```
+
+
+```
+url: /api/v1/projects/<project_id>/privileges
+method: GET	
+```
+- 请求参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 是否必填   |  示例 |
+| ------------ | ------- | ---------------------------------- | ------ |--- |
+| app_sname   | string | app名称 |    是  | simright-simulator|
+
+
+*-* 示例
+
+```json
+{   
+    "app_sname": "simright-simulator"
+}
+```
+
+- 返回参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ |
+| data   |  string | 返回值jwt token |      |
+
+  token payload 说明
+
+| 名称         | 类型    | 说明                               | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ |
+| app_sname   |  string | app名称 |      |
+| pid   |  string | project_id |      |
+| read   |  bool | 读的权限 |      |
+| write   |  bool | 写的权限 |      |
+
 
 *-* 示例
 
