@@ -21,6 +21,7 @@ class Forms(Base):
     var_name = db.Column(db.String(128))
     name = db.Column(db.String(128))
     style = db.Column(db.String(32))
+    version = db.Column(db.integer)
 
     def delete(self):
         db.session.delete(self)
@@ -46,6 +47,7 @@ class FormAttr(Base):
                                     # update_trigger =  # auto/user_click
                                     # validate = db.Column(JSON) #{constrain: {min:0, max: 120}, alert: PopupWindow}
     dependent_attrs = db.Column(ARRAY(db.String(64)))
+    comments = db.Column(db.String(128))
 
 
 class Attribute(Base):
