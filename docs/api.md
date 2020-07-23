@@ -306,26 +306,61 @@ method: GET
 
 *-* 示例
 
-```json
+```
 {
     "api_standard": "1.0",
     "code":0,
-    "data": [
-            {
+    "data": {
              
              "gov_mode": "全周进气",
-             "valve_series": 1
-        },
-        {
-             
-             "gov_mode": "全周进气1",
-             "valve_series":2
+             "series_id": 1,
+             "supply_series_id": 9, # 配套阀门系列,
+             "flow_calc_mode": "单调门流量"
         }
-    ]
 }
 ```
 
-## 1.6 搜索适用阀门信息
+## 1.5 保存修改项目数据
+```
+url: /api/sec_valve/v1/bid_projects/<int:project_id>/data
+method: POST
+```
+
+- 请求参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 是否必填   | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ | ------ |
+| series_id   | integer | 阀门系列 | 否    | 1 |
+
+*-* 示例
+
+```json
+{
+    "series_id": 1,
+    "gov_mode": "喷嘴调节"
+}
+```
+
+- 返回参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ |
+| code   | number | 操作结果 |      |
+
+*-* 示例
+
+```json
+{
+    "api_standard": "1.0",
+    "code":0
+}
+```
+
+## 1.6 获取适用的阀门信息列表
 ```
 url: /api/sec_valve/v1/bid_project/<int:project_id>/matches
 method: GET
@@ -352,33 +387,84 @@ method: GET
     "code":0,
     "data": [
          {
-            "id": 1,
-            "gov_throat_diam": 60,  # 主门口径
-            "stop_throat_diam": 60, # 调门口径
+            "model_id": "VSL-165-130-12-05-50-00",
+            "model_version": "00",
+            "stop_throat_diam": 60,  # 主门口径
+            "gov_throat_diam": 60, # 调门口径
             "press_loss": 2.1  #阀门压损
-            "speed": 110 # 调门流速
+            "speed_level": 110 # 调门流速
+            "temp_level": 110 # 调门流速
+            "series_id": 2 # 阀门系列
+            "design_press": 5 # 设计压力
+            "design_temp": 500 # 设计温度
+            "casing_mat_name": "2G15CR" # 阀壳材料
+            "stem_mat_name": "22cR12N" # 阀杆材料
+            "total_weight": 20 # 总重
+            "stop_throat_speed": 13 # 主门流速
+            "gov_throat_speed": 14 # 调门流速
+            "speed_mode": "阀门平均流速"
          }
     ]
 }
-或 (5,8系列特定场景)
+或 (5,8系列配套9场景)
 {
     "api_standard": "1.0",
     "code":0,
     "data": [
          {
-            "id": 1,
-            "gov_throat_diam": 60,  # 主门口径
-            "stop_throat_diam": 60, # 调门口径
+            "stop_model_id": "VSL-165-130-12-05-50-00", # 主门型号
+            "gov_model_id": "VSL-165-130-12-05-50-00", # 调门型号
+            "stop_throat_diam": 60,  # 主门口径
+            "equiv_throat_diam": 60,  # 当量口径
             "press_loss": 2.1  #阀门压损
-            "speed": 110 # 调门流速
+            "speed_level": 110 # 调门流速
+            "temp_level": 110 # 调门流速
+            "series_id": 2 # 阀门系列
+            "design_press": 5 # 设计压力
+            "design_temp": 500 # 设计温度
+            "casing_mat_name": "2G15CR" # 阀壳材料
+            "stem_mat_name": "22cR12N" # 阀杆材料
+            "total_weight": 20 # 总重
+            "stop_throat_speed": 13 # 主门流速
+            "gov_throat_speed": 14 # 调门流速
+            "supply_model_info": {
+                    "series_id": 9 # 阀门系列
+                    "design_press": 5 # 设计压力
+                    "design_temp": 500 # 设计温度
+                    "casing_mat_name": "2G15CR" # 阀壳材料
+                    "stem_mat_name": "22cR12N" # 阀杆材料
+                    "total_weight": "22cR12N" # 总重
+                }
+         }
+    ]
+}
+或 (5,8系列不配套9场景)
+{
+    "api_standard": "1.0",
+    "code":0,
+    "data": [
+         {
+            "model_id": "VSL-165-130-12-05-50-00",
+            "equiv_throat_diam": 60,  # 当量口径
+            "press_loss": 2.1  #阀门压损
+            "press_level": 110 # 压力等级
+            "temp_level": 110 # 温度等级
+            "series_id": 2 # 阀门系列
+            "design_press": 5 # 设计压力
+            "design_temp": 500 # 设计温度
+            "casing_mat_name": "2G15CR" # 阀壳材料
+            "stem_mat_name": "22cR12N" # 阀杆材料
+            "total_weight": 20 # 总重
+            "stop_throat_speed": 13 # 主门流速
+            "gov_throat_speed": 14 # 调门流速
          }
     ]
 }
 ```
 
-## 1.6 (保存)推荐型号
+## 1.6 发布(保存)推荐型号
 ```
-url: /api/sec_valve/v1/bid_project/<int:project_id>/recommends
+url: /api/sec_valve/v1/bid_project/<int:project_id>/result
 method: POST
 ```
 
@@ -388,13 +474,15 @@ method: POST
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| valve_ids   | array | 选中的推荐型号 | 是    | 1 |
+| model_id   | string | 选中的推荐型号 | 是    | sxl-1 |
+| comments   | string | 选型结论 | 是    | ""|
 
 *-* 示例
 
 ```json
 {
-    "valve_ids": [1, 2]
+    "model_id":  "VSL-165-130-12-05-50-00",
+    "comments": "非常合适"
 }
 ```
 
@@ -415,26 +503,15 @@ method: POST
 }
 ```
 
-## 1.6 获取推荐型号列表
+## 1.6 获取推荐型号选型数据
 ```
-url: /api/sec_valve/v1/bid_project/<int:project_id>/recommends
+url: /api/sec_valve/v1/bid_project/<int:project_id>/data
 method: GET
 ```
 
 - 请求参数：
-*-* 说明：
 
-| 名称         | 类型    | 说明                               | 是否必填   | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ | ------ |
-| design_temp   | integer | 温度筛选 | 否    | [] |
-
-*-* 示例
-
-```
-{
-    "design_temp": [12, ]
-}
-```
+  NA
 
 - 返回参数：
 
@@ -443,7 +520,7 @@ method: GET
 | 名称         | 类型    | 说明                               | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ |
 | code   | number | 操作结果 |      |
-| data   | array | 操作结果 |      |
+| data   | object | 操作结果 |      |
 
 *-* 示例
 
@@ -451,24 +528,12 @@ method: GET
 {
     "api_standard": "1.0",
     "code":0,
-    "data": [
-                {
-                    "vid": "vsl-125-100-12",
-                    "dwg_id":"abdderf",
-                    "used": true  # 标五角星
-                    ...
-                },
-                {
-                    "vid": "vsl-125-100-13",
-                    "dwg_id":"abdderfce",
-                    ...
-                },
-                {
-                    "vid": "vsl-125-100-14,
-                    "dwg_id":"abe",
-                    ....
-                },
-    ]
+    "data": {
+            "design_temp": 500,
+            "gov_mode": "",
+            ...    
+    
+    }
     
 }
 ```
@@ -1271,7 +1336,7 @@ method: GET
 | 名称         | 类型    | 说明                               | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ |
 | code   | number | 操作结果 |      |
-| data   | array | 返回信息 |      |
+| data   | object | 返回信息 |      |
 
 *-* 示例
 
@@ -1279,17 +1344,62 @@ method: GET
 {
     "api_standard": "1.0",
     "code":0,
-    "data":[{
-            "name": "hh",
-            "pressure": 222,
-            "temperature": 111
+    
+    "data":{
+      "header":[
+                {
+                  "name": "机组运行方式",
+                  "var_name": "hh"
+                  },
+                {
+                  "name": "阀门压损范围", 
+                  "var_name": "aa"
+                  }
+              ],
+      "body":[
+              {                
+                "hh": 222,
+                "aa": 111
             },
             {
-            "name": "流速表",
-            "pressure": 333,
-            "temperature": 444
+                "hh": 333,
+                "aa": 444
             }  
     ]
+    }
+}
+```
+
+## 4.3 阀门某系列简介
+```
+url: /api/sec_valve/v1/base_dbs/valve_series/<int:series_id>/brief
+method: GET	
+```
+- 请求参数：
+
+  NA
+
+- 返回参数：
+
+*-* 说明：
+
+| 名称         | 类型    | 说明                               | 示例   |
+| ------------ | ------- | ---------------------------------- | ------ |
+| code   | number | 操作结果 |      |
+| data   | object | 阀门系列信息 |      |
+
+*-* 示例
+
+```json
+{
+    "api_standard": "1.0",
+    "code":0,
+    "data":{
+            "structure": "提升式",
+            "use_scene": "适用于全周进气",
+            "typical_turbine_units": ["196中压", "169高中压"],
+            "sketch": "data:image/jpeg;base64,exETFEdeD1RE..."
+    }
 }
 ```
 
@@ -1325,56 +1435,6 @@ method: GET
 | 名称         | 类型    | 说明                               | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ |
 | data   |   | 返回值 |      |
-
-*-* 示例
-
-```json
-{
-    "api_standard": "1.0",
-    "code":0,
-    "data": ""
-}
-```
-
-
-```
-url: /api/v1/projects/<project_id>/privileges
-method: GET	
-```
-- 请求参数：
-
-*-* 说明：
-
-| 名称         | 类型    | 说明                               | 是否必填   |  示例 |
-| ------------ | ------- | ---------------------------------- | ------ |--- |
-| app_sname   | string | app名称 |    是  | simright-simulator|
-
-
-*-* 示例
-
-```json
-{   
-    "app_sname": "simright-simulator"
-}
-```
-
-- 返回参数：
-
-*-* 说明：
-
-| 名称         | 类型    | 说明                               | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ |
-| data   |  string | 返回值jwt token |      |
-
-  token payload 说明
-
-| 名称         | 类型    | 说明                               | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ |
-| app_sname   |  string | app名称 |      |
-| pid   |  string | project_id |      |
-| read   |  bool | 读的权限 |      |
-| write   |  bool | 写的权限 |      |
-
 
 *-* 示例
 
