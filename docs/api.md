@@ -226,49 +226,56 @@ method: GET
     "api_standard": "1.0",
     "code":0,
     "data": [
-            {
-             "id":5,
-             "name": "配气方式",
-             "var_name": "gov_mode",
-             "symbol": "P",
-             "unit":"m",
-             "value_type":"string",
-             "input":{
-                    "input_from": "table", 
-                    "table_name":"abc", 
-                    "display_field":["abc"], 
-                    "select_field":"abc", 
-                    "addition_attr":{
-                                    "var_name":"def", 
-                                    "select_field": "def"}
-                    },
-            "performance":{
-                            "hide" : true, 
-                            "widget":  "drop_list",
-                            "editable": true 
-                            },
-            "affect_attrs": ["other"]
-        },
         {
-             "id":10,
-             "name": "阀门系列",
-             "var_name": "valve_series",
-             "symbol": "",
-             "unit":"",
-             "value_type":"integer",
-             "input":{
-                    "input_from": "func", 
-                    "func_name":"func123"
-                    },
-            "performance":{
-                            "hide" : true, 
-                            "widget":  "drop_list",
-                            "editable": true 
-                            },
-            "affect_attrs": ["other"]
-        }
+        "id": 1,
+        "cn_name": "阀门参数",
+        "name": "valve_args",
+        "attrs":[
+                {
+                 "id":5,
+                 "cn_name": "配气方式",
+                 "name": "gov_mode",
+                 "symbol": "P",
+                 "unit":"m",
+                 "value_type":"string",
+                 "input":{
+                        "input_from": "table", 
+                        "table_name":"abc", 
+                        "display_field":["abc"], 
+                        "select_field":"abc", 
+                        "addition_attr":{
+                                        "name":"def", 
+                                        "select_field": "def"}
+                        },
+                "performance":{
+                                "hide" : true, 
+                                "widget":  "drop_list",
+                                "editable": true 
+                                },
+                "affect_attrs": ["other"]
+            },
+            {
+                 "id":10,
+                 "cn_name": "阀门系列",
+                 "name": "valve_series",
+                 "symbol": "",
+                 "unit":"",
+                 "value_type":"integer",
+                 "input":{
+                        "input_from": "func", 
+                        "funcn_name":"func123"
+                        },
+                "performance":{
+                                "hide" : true, 
+                                "widget":  "drop_list",
+                                "editable": true 
+                                },
+                "affect_attrs": ["other"]
+            }
+        ]
+    }
     ]
-}
+ }
 ```
 
 ## 1.5 获取表单渲染数据信息
@@ -589,8 +596,8 @@ method: POST
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| name   | string | 表格名称 | 是    | 阀门参数 | 
-| var_name   | string | 变量名 | 是    | valve_args | 
+| cn_name   | string | 表格名称 | 是    | 阀门参数 | 
+| name   | string | 变量名 | 是    | valve_args | 
 | module_name   | string | 函数描述 | 是    | bid | 
 | page_name   | string | 输入参数列表 | bid_data    |  |
 
@@ -598,8 +605,8 @@ method: POST
 
 ```json
 {
-    "name": "阀门参数",
-    "var_name": "valve_args",
+    "cn_name": "阀门参数",
+    "name": "valve_args",
     "module_name": "bid",
     "page_name":"bid_data"
 }
@@ -636,7 +643,7 @@ method: POST
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
 | name   | integer | 参数名 |  是   | 配气方式 | 
-| var_name   | string | 参数变量 | 是    | gov_mode | 
+| name   | string | 参数变量 | 是    | gov_mode | 
 | symbol   | string | 符号 | 否    | P | 
 | unit   | string | 单位 | 否    |  |
 | value_type   | string | 值类型 | 是 | integer |
@@ -645,8 +652,8 @@ method: POST
 
 ```json
 {
-    "name": "配气方式",
-    "var_name": "gov_mode",
+    "cn_name": "配气方式",
+    "name": "gov_mode",
     "symbol": "P",
     "unit":"m",
     "value_type":"integer"
@@ -698,16 +705,16 @@ method: GET
     "data": [
             {   
                 "id": 1,
-                "name": "配气方式",
-                "var_name": "gov_mode",
+                "cn_name": "配气方式",
+                "name": "gov_mode",
                 "symbol": "P",
                 "unit":"m",
                 "value_type":"string"
             },
             {
                 "id": 2,
-                "name": "阀门系列",
-                "var_name": "valve_series",
+                "cn_name": "阀门系列",
+                "name": "valve_series",
                 "symbol": "",
                 "unit": "",
                 "value_type": "integer"
@@ -741,8 +748,8 @@ input解释
   "table_name": "abc",  
   "display_field":["abc"], # 展示那些字段 
   "select_field":"abc",    # 选中时取那一列的值
-  "addition_value":[{"var_name": "def",  # 选中时,同时记录那些数据
-                      "name"; "呵呵"
+  "addition_value":[{"name": "def",  # 选中时,同时记录那些数据
+                      "cn_name"; "呵呵"
                      "select_field": "def"}
                      ]
   }
@@ -805,7 +812,7 @@ comments解释
             "display_field":["abc"], 
             "select_field":"abc", 
             "addition_value":{
-                            "var_name":"def", 
+                            "name":"def", 
                             "select_field": "def"}
             },
     "performance":{
@@ -877,13 +884,13 @@ method: GET
     "data": [
                 {
                     "id": 1,
-                    "name": "阀门参数",
-                    "var_name": "valve_args"
+                    "cn_name": "阀门参数",
+                    "name": "valve_args"
                 },
                 {
                     "id": 2,
-                    "name": "机组参数",
-                    "var_name": "unit_args"
+                    "cn_name": "机组参数",
+                    "name": "unit_args"
                 }
     ]
 }
@@ -917,13 +924,13 @@ method: GET
     "data": [
                 {
                     "id": 1,
-                    "name": "配器方式",
-                    "var_name": "gov_mod"
+                    "cn_name": "配器方式",
+                    "name": "gov_mod"
                 },
                 {
                     "id": 2,
-                    "name": "阀门系列",
-                    "var_name": "valve_series"
+                    "cn_name": "阀门系列",
+                    "name": "valve_series"
                 }
     ]
 }
@@ -962,7 +969,7 @@ method: GET
             "display_field":["abc"], 
             "select_field":"abc", 
             "addition_attr":{
-                            "var_name":"def", 
+                            "name":"def", 
                             "select_field": "def"}
             },
     "performance":{
@@ -997,7 +1004,7 @@ method: PATCH
 
 ```json
 {
-    "name": "配气方式",
+    "cn_name": "配气方式",
     "symbol": "P",
     "unit":"m",
     "value_type":"integer"
@@ -1107,7 +1114,7 @@ method: POST
 ```
 ## 3.3 修改函数
 ```
-url: /api/sec_valve/v1/functions/<func_name>
+url: /api/sec_valve/v1/functions/<funcn_name>
 method: PATCH	
 ```
 - 请求参数：
@@ -1196,7 +1203,7 @@ method: GET
 ```
 ## 3.5 具体函数信息
 ```
-url: /api/sec_valve/v1/functions/<func_name>
+url: /api/sec_valve/v1/functions/<funcn_name>
 method: GET	
 ```
 - 请求参数：
@@ -1296,11 +1303,11 @@ method: GET
     "api_standard": "1.0",
     "code":0,
     "data":[{
-            "name": "阀门产品库",
+            "cn_name": "阀门产品库",
             "value":"valve_products_table"
             },
             {
-            "name": "流速表",
+            "cn_name": "流速表",
             "value": "speed_range_table"
             }  
     ]
@@ -1348,12 +1355,12 @@ method: GET
     "data":{
       "header":[
                 {
-                  "name": "机组运行方式",
-                  "var_name": "hh"
+                  "cn_name": "机组运行方式",
+                  "name": "hh"
                   },
                 {
-                  "name": "阀门压损范围", 
-                  "var_name": "aa"
+                  "cn_name": "阀门压损范围", 
+                  "name": "aa"
                   }
               ],
       "body":[
