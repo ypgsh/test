@@ -18,8 +18,8 @@ class Forms(Base):
     __tablename__ = 'forms'
     module_name = db.Column(db.String(128))
     page_name = db.Column(db.String(128))
-    var_name = db.Column(db.String(128))
     name = db.Column(db.String(128))
+    cn_name = db.Column(db.String(128))
     style = db.Column(db.String(32))
     version = db.Column(db.integer)
 
@@ -30,8 +30,8 @@ class Forms(Base):
 
 class FormAttr(Base):
     form_id = db.Column(db.Integer)
-    name = db.Column(db.String(128))
-    var_name = db.Column(db.String(64))
+    cn_name = db.Column(db.String(128))
+    name = db.Column(db.String(64))
     symbol = db.Column(db.String(32), default='')
     unit = db.Column(db.String(32), default='')
     value_type = db.Column(db.String(32))
@@ -51,8 +51,8 @@ class FormAttr(Base):
 
 
 class Attribute(Base):
-    name = db.Column(db.String(128))
-    var_name = db.Column(db.String(64))
+    cn_name = db.Column(db.String(128))
+    name = db.Column(db.String(64))
     symbol = db.Column(db.String(32), default='')
     unit = db.Column(db.String(32), default='')
     value_type = db.Column(db.String(32))
