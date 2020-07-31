@@ -255,7 +255,7 @@ method: GET
                  "input":{
                         "input_from": "table", 
                         "table_name":"abc", 
-                        "display_field":["abc"], 
+                        "display_fields":["abc"], 
                         "select_field":"abc", 
                         "addition_attr":{
                                         "name":"def", 
@@ -408,13 +408,13 @@ method: GET
     "code":0,
     "data": [
          {
-            "model_id": "VSL-165-130-12-05-50-00",
+            "model_id": "VSL-165-130-12-05-50",
             "model_version": "00",
             "stop_throat_diam": 60,  # 主门口径
             "gov_throat_diam": 60, # 调门口径
             "press_loss": 2.1  #阀门压损
-            "speed_level": 110 # 调门流速
-            "temp_level": 110 # 调门流速
+            "press_level": 110 # 压力等级
+            "temp_level": 110 # 温度等级
             "series_id": 2 # 阀门系列
             "design_press": 5 # 设计压力
             "design_temp": 500 # 设计温度
@@ -433,13 +433,12 @@ method: GET
     "code":0,
     "data": [
          {
-            "stop_model_id": "VSL-165-130-12-05-50-00", # 主门型号
-            "gov_model_id": "VSL-165-130-12-05-50-00", # 调门型号
+            "model_id": "VSL-165-130-12-05-50-00", # 主门型号            
             "stop_throat_diam": 60,  # 主门口径
             "equiv_throat_diam": 60,  # 当量口径
             "press_loss": 2.1  #阀门压损
-            "speed_level": 110 # 调门流速
-            "temp_level": 110 # 调门流速
+            "press_level": 110 # 压力等级
+            "temp_level": 110 # 温度等级
             "series_id": 2 # 阀门系列
             "design_press": 5 # 设计压力
             "design_temp": 500 # 设计温度
@@ -450,6 +449,7 @@ method: GET
             "gov_throat_speed": 14 # 调门流速
             "supply_model_info": {
                     "series_id": 9 # 阀门系列
+                    "model_id": "VSL-165-130-12-05-50-00", # 调门型号
                     "design_press": 5 # 设计压力
                     "design_temp": 500 # 设计温度
                     "casing_mat_name": "2G15CR" # 阀壳材料
@@ -760,12 +760,11 @@ input解释
 {
   "input_from": "table",
   "table_name": "abc",  
-  "display_field":["abc"], # 展示那些字段 
+  "display_fields":["abc"], # 展示那些字段 
   "select_field":"abc",    # 选中时取那一列的值
-  "addition_value":[{"name": "def",  # 选中时,同时记录那些数据
-                      "cn_name"; "呵呵"
-                     "select_field": "def"}
-                     ]
+  "addition_attr":{"name": "def",  # 选中时,同时记录那些数据
+                  "cn_name"; "呵呵"
+                 "select_field": "def"}
   }
   
 - 函数计算
@@ -823,7 +822,7 @@ comments解释
     "input":{
             "input_from": "table", 
             "table_name":"abc", 
-            "display_field":["abc"], 
+            "display_fields":["abc"], 
             "select_field":"abc", 
             "addition_value":{
                             "name":"def", 
@@ -980,7 +979,7 @@ method: GET
     "input":{
             "input_from": "table", 
             "table_name":"abc", 
-            "display_field":["abc"], 
+            "display_fields":["abc"], 
             "select_field":"abc", 
             "addition_attr":{
                             "name":"def", 
