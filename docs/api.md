@@ -433,7 +433,8 @@ method: GET
     "code":0,
     "data": [
          {
-            "model_id": "VSL-165-130-12-05-50-00", # 主门型号            
+            "model_id": "VSL-165-130-12-05-50-00", # 主门型号        
+            "gov_model_id": "VSL-165-130-12-05-50-00", # 调门型号    
             "stop_throat_diam": 60,  # 主门口径
             "equiv_throat_diam": 60,  # 当量口径
             "press_loss": 2.1  #阀门压损
@@ -483,7 +484,7 @@ method: GET
 }
 ```
 
-## 1.6 发布(保存)推荐型号
+## 1.6 保存预选型号/保存推荐型号
 ```
 url: /api/sec_valve/v1/bid_project/<int:project_id>/result
 method: POST
@@ -495,15 +496,20 @@ method: POST
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| model_id   | string | 选中的推荐型号 | 是    | sxl-1 |
-| comments   | string | 选型结论 | 是    | ""|
+| candidate_model_ids   | array | 选中的推荐型号 | 是    | ["sxl-1"] |
+| recomend_model_id   | string | 推荐型号 | 是    | "sxl-1" |
 
 *-* 示例
 
 ```json
 {
-    "model_id":  "VSL-165-130-12-05-50-00",
-    "comments": "非常合适"
+    "candidate_model_ids":  ["VSL-165-130-12-05-50-00"]
+}
+```
+
+```json
+{
+    "recomend_model_id":"VSL-165-130-12-05-50-00"
 }
 ```
 
@@ -559,44 +565,6 @@ method: GET
 }
 ```
 
-## 1.7 确定选定某型号
-```
-url: /api/sec_valve/v1/bid_project/<int:project_id>
-method: PATCH
-```
-
-- 请求参数：
-*-* 说明：
-
-| 名称         | 类型    | 说明                               | 是否必填   | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ | ------ |
-| select_valve   | integer | 选定型号 | 是    | 1 |
-
-*-* 示例
-
-```
-{
-    "select_valve": 2
-}
-```
-
-- 返回参数：
-
-*-* 说明：
-
-| 名称         | 类型    | 说明                               | 示例   |
-| ------------ | ------- | ---------------------------------- | ------ |
-| code   | number | 操作结果 |      |
-
-*-* 示例
-
-```
-{
-    "api_standard": "1.0",
-    "code":0
-    
-}
-```
 
 # 二 表格相关
 ## 2.1 配置表格
