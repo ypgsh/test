@@ -14,6 +14,7 @@
 | 1002 | GET_USER_INFO_ERROR  |
 | 1003 | NOT_LOGIN  |
 | 1004 | FORBIDDEN  |
+| 1005 | TEST_ERROR  |
 
 
 # 一、投标项目
@@ -421,9 +422,9 @@ method: GET
             "casing_mat_name": "2G15CR" # 阀壳材料
             "stem_mat_name": "22cR12N" # 阀杆材料
             "total_weight": 20 # 总重
-            "stop_throat_speed": 13 # 主门流速
-            "gov_throat_speed": 14 # 调门流速
-            "speed_mode": "阀门平均流速"
+            "stop_throat_velocity": 13 # 主门流速
+            "gov_throat_velocity": 14 # 调门流速
+            "velocity_mode": "阀门平均流速"
          }
     ]
 }
@@ -446,8 +447,8 @@ method: GET
             "casing_mat_name": "2G15CR" # 阀壳材料
             "stem_mat_name": "22cR12N" # 阀杆材料
             "total_weight": 20 # 总重
-            "stop_throat_speed": 13 # 主门流速
-            "gov_throat_speed": 14 # 调门流速
+            "stop_throat_velocity": 13 # 主门流速
+            "gov_throat_velocity": 14 # 调门流速
             "supply_model_info": {
                     "series_id": 9 # 阀门系列
                     "model_id": "VSL-165-130-12-05-50-00", # 调门型号
@@ -477,8 +478,8 @@ method: GET
             "casing_mat_name": "2G15CR" # 阀壳材料
             "stem_mat_name": "22cR12N" # 阀杆材料
             "total_weight": 20 # 总重
-            "stop_throat_speed": 13 # 主门流速
-            "gov_throat_speed": 14 # 调门流速
+            "stop_throat_velocity": 13 # 主门流速
+            "gov_throat_velocity": 14 # 调门流速
          }
     ]
 }
@@ -1032,7 +1033,7 @@ method: POST
     "name": "calc_len",
     "desc": "计算长度",
     "input_args": ["dim", "length"],
-    "code_content":"def run(dim, length):\n    return dim * length"
+    "code_content":"def calc_len(dim, length):\n    return dim * length"
 }
 ```
 
@@ -1054,7 +1055,7 @@ method: POST
 ```
 ## 3.2 测试函数
 ```
-url: /api/sec_valve/v1/function/test
+url: /api/sec_valve/v1/functions/<string:funcn_name>/test
 method: POST	
 ```
 - 请求参数：
@@ -1063,14 +1064,12 @@ method: POST
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| name   | string | 函数名称 | 是    |  | 
 | input_args   | object | 输入参数值 | 是    |  |
 
 *-* 示例
 
 ```json
-{
-    "name": "calc_len",
+{    
     "input_args": {"dim":12, "length":10 }
 }
 ```
@@ -1095,7 +1094,7 @@ method: POST
 ```
 ## 3.3 修改函数
 ```
-url: /api/sec_valve/v1/functions/<funcn_name>
+url: /api/sec_valve/v1/functions/<string:funcn_name>
 method: PATCH	
 ```
 - 请求参数：
@@ -1145,13 +1144,13 @@ method: GET
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| return_infos   | array | 返回值包含信息(name, input_args, desc, code_content) | 否    | 默认都包含 | 
+| fields   | array | 返回值包含信息(name, input_args, desc, code_content) | 否    | 默认都包含 | 
 
 *-* 示例
 
 ```json
 {   
-    "return_infos": ["name", "desc"]
+    "fields": ["name", "desc"]
 }
 ```
 
@@ -1184,7 +1183,7 @@ method: GET
 ```
 ## 3.5 具体函数信息
 ```
-url: /api/sec_valve/v1/functions/<funcn_name>
+url: /api/sec_valve/v1/functions/<string:funcn_name>
 method: GET	
 ```
 - 请求参数：
@@ -1289,7 +1288,7 @@ method: GET
             },
             {
             "cn_name": "流速表",
-            "value": "speed_range_table"
+            "value": "velocity_range_table"
             }  
     ]
 }
