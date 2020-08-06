@@ -9,4 +9,5 @@ class ReturnCode(Enum):
     NOT_LOGIN = 1003
     FORBIDDEN = 1004
     NOT_FOUND = 1005
+    TEST_ERROR = 1005
 
