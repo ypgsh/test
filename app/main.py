@@ -7,12 +7,12 @@ from flask_cors import CORS
 
 from app.extension import db, marshmallow
 
-from app.views import auth, function
+from app.views import auth, function, form
 from app.config import get_config
 
 def config_blueprint(app):
     _ = [app.register_blueprint(bp, url_prefix='/api/sec_valve/v1')
-    for bp in (auth, function)]
+    for bp in (auth, function, form)]
 
 
 def create_app(config_name=None):

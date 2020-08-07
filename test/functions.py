@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from app.main import create_app, db
 
-from test.data import functions
+from test.data import functions_data
 
 app = create_app('test')
 
@@ -49,16 +49,16 @@ class ApiTest(unittest.TestCase):
 
     def _create_function(self):
         create_function_url = '/api/sec_valve/v1/function'
-        resp = self.client.post(create_function_url, json=functions.CREATE_FUNCTION)
+        resp = self.client.post(create_function_url, json=functions_data.CREATE_FUNCTION)
         assert resp.status_code == 201
 
-        test_function_url = f'/api/sec_valve/v1/functions/{functions.CREATE_FUNCTION["name"]}/test'
-        resp = self.client.post(test_function_url, json = functions.TEST_FUNCTION_ARGS)
+        test_function_url = f'/api/sec_valve/v1/functions/{functions_data.CREATE_FUNCTION["name"]}/test'
+        resp = self.client.post(test_function_url, json = functions_data.TEST_FUNCTION_ARGS)
         assert resp.status_code == 200
-        assert resp.json['data'] == functions.TEST_FUNCTION_RESULT
+        assert resp.json['data'] == functions_data.TEST_FUNCTION_RESULT
 
     def _delete_function(self):
-        delete_function_url = f'/api/sec_valve/v1/functions/{functions.CREATE_FUNCTION["name"]}'
+        delete_function_url = f'/api/sec_valve/v1/functions/{functions_data.CREATE_FUNCTION["name"]}'
         resp = self.client.delete(delete_function_url)
         assert resp.status_code == 200
 
