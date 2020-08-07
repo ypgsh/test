@@ -14,8 +14,8 @@ class Config:
     JWT_TOKEN_NAME= 'simright_token'
 
     MAIN_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-    DATABASE_ADDR = os.environ.get('DATABASE_ADDR') or 'localhost:5437'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres_rotor@{}/postgres'.format(DATABASE_ADDR)
+    DATABASE_ADDR = os.environ.get('DATABASE_ADDR') or 'localhost:5438'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres_valve@{}/postgres'.format(DATABASE_ADDR)
 
     DATA_DIR = os.path.join(MAIN_DIR, 'data')
     if not os.path.exists(DATA_DIR):
@@ -53,14 +53,11 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO=True
 
 
-    # def __new__(cls, *args, **kwargs):
-    #     print(cls.__name__[:-6])
-    #     return object.__new__(cls, *args, **kwargs)
 
 
 class TestConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres_rotor@{}/postgres_test'.format(Config.DATABASE_ADDR)
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres_valve@{}/postgres_test'.format(Config.DATABASE_ADDR)
     WORK_ROOT = '/workroot/test'
 
 class ProductConfig(Config):

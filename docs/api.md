@@ -921,7 +921,7 @@ method: GET
 ## 2.5
 获取某表单某属性内容
 ```
-url: /api/sec_valve/v1/form/<int:form_id>/attrs/<int:form_attr_id>
+url: /api/sec_valve/v1/forms/<int:form_id>/attrs/<int:form_attr_id>
 method: GET	
 ```
 - 请求参数：
@@ -959,7 +959,7 @@ method: GET
                     "widget":  "drop_list",
                     "editable": true 
                     },
-    "depend_attrs": ["gov_mode1"]
+    "dependent_attrs": ["gov_mode1"]
   }
 }
 
