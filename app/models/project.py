@@ -39,6 +39,7 @@ class BidProject(Base):
 class BidProjectSchema(marshmallow.Schema):
     # validate
     status = Function(lambda obj: obj.get_status())
+    name = Function(lambda obj: obj.data['name'])
     class Meta:
-        fields = ('id', 'form_id', 'status', 'update_time')
+        fields = ('id', 'name', 'status', 'update_time')
 

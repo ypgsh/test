@@ -14,9 +14,20 @@ def create_project():
 
 @bid_project.route('/bid_projects/<int:project_id>/data', methods= ['POST', 'GET'])
 def project_data(project_id: int):
-    pass
+    if request.method == 'POST':
+        args = request.get_json()
+        return_code, data = BidProjectManager.modify_project_data(project_id, **args)
+        return json_response(200, code=return_code.value)
+    else:
+        pass
 
 @bid_project.route('/bid_projects')
 @bid_project.route('/bid_projects/<int:project_id>/brief')
-def projects_brief_info(project_id: int):
-    pass
+def projects_brief_info(project_id: int = None):
+    if not project_id:
+        args = request.args
+        return_code, data = BidProjectManager.get_projects(**args)
+        return json_response(200, code=return_code.value, data=data)
+    else:
+        return_code, data = BidProjectManager.get_project_brief(project_id)
+        return json_response(200, code=return_code.value, data=data)
