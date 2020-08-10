@@ -342,7 +342,7 @@ method: GET
 }
 ```
 
-## 1.5 保存修改项目数据
+## 1.6 保存修改项目数据
 ```
 url: /api/sec_valve/v1/bid_projects/<int:project_id>/data
 method: POST
@@ -382,7 +382,7 @@ method: POST
 }
 ```
 
-## 1.6 获取适用的阀门信息列表
+## 1.7 获取适用的阀门信息列表
 ```
 url: /api/sec_valve/v1/bid_project/<int:project_id>/matches
 method: GET
@@ -485,7 +485,7 @@ method: GET
 }
 ```
 
-## 1.6 保存预选型号/保存推荐型号
+## 1.8 保存预选型号/保存推荐型号
 ```
 url: /api/sec_valve/v1/bid_project/<int:project_id>/result
 method: POST
@@ -498,7 +498,7 @@ method: POST
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
 | candidate_model_ids   | array | 选中的推荐型号 | 是    | ["sxl-1"] |
-| recomend_model_id   | string | 推荐型号 | 是    | "sxl-1" |
+| recommend_model_id   | string | 推荐型号 | 是    | "sxl-1" |
 
 *-* 示例
 
