@@ -28,7 +28,7 @@ def base_dbs_operate(db_name: str = None):
         return json_response(200, code=return_code.value, data = data)
 
 
-@base_dbs.route('/base_dbs/valve_series/<int:valve_series_id>/brief', methods=['GET'])
-def valve_series(valve_series_id: int):
-    return_code, data = BaseDBManager.get_valve_series_breif(valve_series_id)
+@base_dbs.route('/base_dbs/valve_series/<int:series_id>/brief', methods=['GET'])
+def valve_series(series_id: int):
+    return_code, data = BaseDBManager.get_valve_series_breif(series_id)
     return json_response(200, code=return_code.value, data=data)

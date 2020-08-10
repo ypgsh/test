@@ -27,7 +27,7 @@ DB_LIST = [
 
 DB_MODEL_REFLECT ={
     'temperature': Temperature,
-    'value_series': ValveSeries,
+    'valve_series': ValveSeries,
     'velocity': Velocity,
     'pressure': Pressure
 }
