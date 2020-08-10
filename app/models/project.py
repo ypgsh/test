@@ -18,6 +18,8 @@ class BidProject(Base):
     __tablename__ = 'bid_project'
     data = db.column(JSON)
 
+
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
@@ -27,4 +29,16 @@ class BidProject(Base):
         return cls.query.filter_by(id=id).first()
 
 
+    def get_status(self):
+        if self.data.get('recommend_id'):
+            return 'finish'
+        else:
+            return 'undertaking'
+
+
+class BidProjectSchema(marshmallow.Schema):
+    # validate
+    status = Function(lambda obj: obj.get_status())
+    class Meta:
+        fields = ('id', 'form_id', 'status', 'update_time')
 
