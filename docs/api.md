@@ -254,7 +254,7 @@ method: GET
 
 ## 1.5 获取表单渲染数据信息
 ```
-url: /api/sec_valve/v1/form_data
+url: /api/sec_valve/v1/bid_projects/<int:project_id>/form_data
 method: GET
 ```
 
@@ -264,15 +264,13 @@ method: GET
 
 | 名称         | 类型    | 说明                               | 是否必填   | 示例   |
 | ------------ | ------- | ---------------------------------- | ------ | ------ |
-| form_id   | integer | form_id | 是    | 1 | 
-| project_id   | integer | 项目id | 是    | 2 |
+| form_id   | integer | form_id | 是    | 1 |
 
 *-* 示例
 
 ```json
 {
-    "form_id": 1,
-    "project_id": 2
+    "form_id": 1
 }
 ```
 

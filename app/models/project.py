@@ -34,6 +34,9 @@ class BidProject(Base):
             return 'finish'
         else:
             return 'undertaking'
+    @classmethod
+    def get_project_data(cls, project_id: int):
+        return cls.get(project_id).data
 
 
 class BidProjectSchema(marshmallow.Schema):
