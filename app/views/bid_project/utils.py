@@ -41,10 +41,20 @@ class BidProjectManager:
 
     @classmethod
     def get_project_brief(cls, project_id: int):
-
+        template = {
+            "basic_info": ['name', 'status', 'desc'],
+            "turbine_unit_info": ['design_press', 'design_temp', 'design_flow', 'velocity_range'],
+            "valve_info": ['series_id', 'model_id', 'model_version']
+        }
         obj = BidProject.get(project_id)
         data = BidProjectSchema().dump(obj).data
-        return ReturnCode.SUCCESS, data
+        result = dict(basic_info=data,
+                      turbine_unit_info=dict([(key, obj.data.get(key)) for key in template['turbine_unit_info']]),
+                      valve_info=dict(series_id=obj.data.get('series_id'),
+                                      model_id=obj.data.get('recommend_model_id').rsplit('-',1)[0],
+                                      model_version=obj.data.get('recommend_model_id').rsplit('-',1)[1])
+                      )
+        return ReturnCode.SUCCESS, result
 
     @classmethod
     def modify_project_data(cls, project_id, **kwargs):
@@ -53,6 +63,11 @@ class BidProjectManager:
         flag_modified(obj, 'data')
         obj.save()
         return ReturnCode.SUCCESS, ''
+
+    @classmethod
+    def get_project_data(cls, project_id):
+        obj = BidProject.get(project_id)
+        return ReturnCode.SUCCESS, obj.data
 
     @classmethod
     def get_form_data(cls, project_id: int, form_id: int):

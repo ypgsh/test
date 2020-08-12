@@ -21,7 +21,8 @@ def project_data(project_id: int):
         return_code, data = BidProjectManager.modify_project_data(project_id, **args)
         return json_response(200, code=return_code.value)
     else:
-        pass
+        return_code, data = BidProjectManager.get_project_data(project_id)
+        return json_response(200, code=return_code.value, data=data)
 
 
 @bid_project.route('/bid_projects')

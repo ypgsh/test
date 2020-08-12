@@ -153,10 +153,16 @@ method: GET
     "api_standard": "1.0",
     "code":0,
     "data": {
-                "type": "投标选型",
-                "name":"项目名称", 
-                "design_temp":"530",
-                "director": "张三"
+            "basic_info":{
+                    "name":"项目名称", 
+                    "status":"未完成",
+                    "director": "张三"
+                },
+            "turbine_unit_info":{
+                        "design_press": 500
+                        }},
+            "valve_info": {
+                    "series_id": 2
             }
 }
 ```
