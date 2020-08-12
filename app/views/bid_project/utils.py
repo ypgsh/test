@@ -1,10 +1,12 @@
 
 import math
+import itertools
+from typing import Optional
 
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.models.project import BidProject, BidProjectSchema
-from app.models.base_data import ValveProducts, ValveProducts58
+from app.models.base_data import ValveProducts, ValveProducts58, ValveProductSchema, ValveProduct58Schema
 
 from app.views.utils import ReturnCode
 
@@ -97,23 +99,38 @@ class BidProjectMatcher:
                 return config.flow_calc_model
         raise Exception('unsupported series id: {}'.format(series_id))
 
-    def _get_recommend_velocity(self) -> float:
-        pass
+
+
 
     def get_matches(self):
         flow_calc_model = self._get_flow_calc_model()
-        recommend_velocity = self._get_recommend_velocity()
-        if flow_calc_model == "单个调门流量":
-            gov_throat_diam = FuncCollections.equiv_diam(self._data['design_temp'],
+
+        velocity_range_min, velocity_range_max = self._data['velocity_range']
+        if flow_calc_model == "单个调门流量": # series 1 2 3 4
+
+            gov_throat_diam_max = FuncCollections.equiv_diam(self._data['design_temp'],
                                                     self._data['design_press'],
                                                     self._data['design_flow'],
-                                                    recommend_velocity)
-            gov_throat_diam_min, gov_throat_diam_max = gov_throat_diam*0.95, gov_throat_diam * 1.05
+                                                    velocity_range_min)
+            gov_throat_diam_min = FuncCollections.equiv_diam(self._data['design_temp'],
+                                                             self._data['design_press'],
+                                                             self._data['design_flow'],
+                                                             velocity_range_max)
+            gov_throat_diam_min, gov_throat_diam_max = gov_throat_diam_min*0.95, gov_throat_diam_max * 1.05
+            # if self._data['series_id'] not in [5, 8]:
             product_objs = ValveProducts.query\
                                             .filter(ValveProducts.gov_throat_diam
-                                                    .between(gov_throat_diam_min, gov_throat_diam_max)
+                                                    .between(gov_throat_diam_min, gov_throat_diam_max),
+                                                    ValveProducts.series_id==self._data['series_id']
                                                     )\
                                             .all()
+            # else:
+            #     product_objs = ValveProducts58.query \
+            #         .filter(ValveProducts58.equiv_diam
+            #                 .between(gov_throat_diam_min, gov_throat_diam_max),
+            #                 ValveProducts58.series_id == self._data['series_id']
+            #                 ) \
+            #         .all()
             if not product_objs:
                 return ReturnCode.FAILURE, 'not suitable gov_throat_diam'
 
@@ -122,54 +139,130 @@ class BidProjectMatcher:
                                                             self._data['design_press'],
                                                             self._data['design_flow'],
                                                             obj.stop_throat_diam,
+                                                            obj.gov_throat_diam,
                                                             (self._data['series_id'])))
                  for obj in product_objs]
-
+            # 压损范围筛选
             in_press_loss_range_products = [obj for obj in product_objs
                                             if obj.press_loss > self._data['press_loss_range'][0]
                                                 and obj.press_loss < self._data['press_loss_range'][1]
                                             ]
             if not in_press_loss_range_products:
                 return ReturnCode.FAILURE, 'not suitable stop_throat_diam'
-            return ReturnCode.SUCCESS, in_press_loss_range_products
-        else:
-            equiv_diam = FuncCollections.equiv_diam(self._data['design_temp'],
+
+            # 计算平均流速
+            _ = [setattr(obj, 'single_velocity', FuncCollections.single_velocity(
+                self._data['design_temp'],
+                self._data['design_press'],
+                self._data['design_flow'],
+                obj.gov_throat_diam,  # 5 8 系列的话就没有
+            ))
+                 for obj in in_press_loss_range_products]
+
+            # 计算平均流速
+            _ = [setattr(obj, 'single_velocity', FuncCollections.single_velocity(
+                self._data['design_temp'],
+                self._data['design_press'],
+                self._data['design_flow'],
+                obj.gov_throat_diam,  # 5 8 系列的话就没有
+            ))
+                 for obj in in_press_loss_range_products]
+
+            data = ValveProductSchema().dump(in_press_loss_range_products, many=True)
+            return ReturnCode.SUCCESS, data
+        else: # series 58
+            equiv_diam_max = FuncCollections.equiv_diam(self._data['design_temp'],
                                                          self._data['design_press'],
                                                          self._data['design_flow'],
-                                                         recommend_velocity)
-            equiv_diam_min, equiv_diam_max = equiv_diam * 0.95, equiv_diam * 1.05
-            product_objs58 = ValveProducts58.query \
-                .filter(ValveProducts.stop_throat_diam
-                        .between(equiv_diam_min, equiv_diam_min)
+                                                         velocity_range_min)
+
+            equiv_diam_min = FuncCollections.equiv_diam(self._data['design_temp'],
+                                                        self._data['design_press'],
+                                                        self._data['design_flow'],
+                                                        velocity_range_max)
+            equiv_diam_min, equiv_diam_max = equiv_diam_min * 0.95, equiv_diam_max * 1.05
+
+            # if self._data['series_id'] not in [5, 8]:
+            #     product_objs = ValveProducts.query\
+            #                                     .filter(ValveProducts.gov_throat_diam
+            #                                             .between(equiv_diam_min, equiv_diam_max),
+            #                                             ValveProducts.series_id==self._data['series_id']
+            #                                             )\
+            #                                     .all()
+            # else:
+            product_objs = ValveProducts58.query \
+                .filter(ValveProducts58.equiv_diam
+                        .between(equiv_diam_min, equiv_diam_max),
+                        ValveProducts58.series_id == self._data['series_id']
                         ) \
                 .all()
 
-
-            if not product_objs58:
+            if not product_objs:
                 return ReturnCode.FAILURE, 'not suitable gov_throat_diam'
+
             if self._data['gov_mode'] == '喷嘴调节':
-                product_objs_9 = ValveProducts.query \
-                    .filter(ValveProducts.gov_throat_diam
-                            .between(equiv_diam_min, equiv_diam_min)
-                            ) \
-                    .all()
-                pass
-            else:
+                # compose with series 9
+                product_objs_9 = ValveProducts.query.filter_by(series_id=9).all()
+                products_compose = itertools.product(product_objs, product_objs_9)
+
+                ComposeProduct = ClassFactory.compose_product_class()
+                compose_products = [ComposeProduct(*compose) for compose in products_compose]
+                # 计算压损
+                _ = [setattr(obj, 'press_loss', FuncCollections.press_loss(
+                    self._data['design_temp'],
+                    self._data['design_press'],
+                    self._data['design_flow'],
+                    obj.stop_product.stop_throat_diam,  # 5 8 系列的话就没有
+                    obj.gov_product.equiv_diam,
+                    (self._data['series_id'], 9)))
+                     for obj in compose_products]
+                # 压损筛选
+                in_press_loss_range_products = [obj for obj in product_objs
+                                                if obj.press_loss > self._data['press_loss_range'][0]
+                                                and obj.press_loss < self._data['press_loss_range'][1]
+                                                ]
+
+                # 计算平均流速
+                _ = [setattr(obj, 'average_velocity', FuncCollections.average_velocity(
+                    self._data['design_temp'],
+                    self._data['design_press'],
+                    self._data['design_flow'],
+                    obj.gov_product.equiv_diam,
+                ))
+                     for obj in in_press_loss_range_products]
+
+                data = [ValveProduct58Schema().dump(obj.gov_product).update(ValveProductSchema().dump(obj.stop_product))
+                        for obj in in_press_loss_range_products]
+                return ReturnCode.SUCCESS, data
+            else: # 8 series only
+                # 计算压损
                 _ = [setattr(obj, 'press_loss', FuncCollections.press_loss(
                                                 self._data['design_temp'],
                                                 self._data['design_press'],
                                                 self._data['design_flow'],
-                                                obj.stop_throat_diam,
+                                                None,
+                                                obj.equiv_diam,  # 5 8 系列的话就没有
                                                 (self._data['series_id'])))
-                     for obj in product_objs58]
-
-                in_press_loss_range_products = [obj for obj in product_objs58
+                     for obj in product_objs]
+                # 压损筛选
+                in_press_loss_range_products = [obj for obj in product_objs
                                                 if obj.press_loss > self._data['press_loss_range'][0]
                                                 and obj.press_loss < self._data['press_loss_range'][1]
                                                 ]
                 if not in_press_loss_range_products:
                     return ReturnCode.FAILURE, 'not suitable stop_throat_diam'
-                return ReturnCode.SUCCESS, in_press_loss_range_products
+
+                # 计算平均流速
+                _ = [setattr(obj, 'average_velocity', FuncCollections.average_velocity(
+                    self._data['design_temp'],
+                    self._data['design_press'],
+                    self._data['design_flow'],
+                    obj.equiv_diam,
+                    ))
+                     for obj in in_press_loss_range_products]
+                data = ValveProduct58Schema().dump(in_press_loss_range_products, many=True)
+                return ReturnCode.SUCCESS, data
+
 
 
 class FuncCollections:
@@ -187,6 +280,19 @@ class FuncCollections:
         return steam.v
 
     @classmethod
+    def specific_enthalphy(cls, temperature: float, pressure: float) -> float:
+        """
+        比焓
+        :param temperature:
+        :param pressure:
+        :return:
+        """
+        from iapws import IAPWS97
+        steam = IAPWS97(T=temperature + 273.15, P=pressure)
+        return steam.h
+
+    # equiv_diam == gov_diam
+    @classmethod
     def equiv_diam(cls, design_temp: float,
                    design_press: float,
                    design_flow: float,
@@ -200,7 +306,7 @@ class FuncCollections:
                         * 1000
 
     @classmethod
-    def press_loss(cls,
+    def stop_throat_press_loss(cls,
                    design_temp: float,
                    design_press: float,
                    design_flow: float,
@@ -217,6 +323,76 @@ class FuncCollections:
                + 1.200006159*math.pow(flow_coeff, 2) \
                - 0.0179715162*flow_coeff \
                + factor
+
+    @classmethod
+    def press_loss(cls,
+                       design_temp: float,
+                       design_press: float,
+                       design_flow: float,
+                       stop_throat_diam: Optional[float],
+                       gov_throat_diam: float,
+                       series_compose: tuple
+                       ):
+        def _stop_press_loss():
+            flow_coeff = cls.flow_coeff(design_press, design_flow, stop_throat_diam, specific_volume)
+            if series_compose == (8, 9):
+                factor = 0.0130212516287
+            else:
+                factor = 0.01500212516287
+            return -0.91246315 * math.pow(flow_coeff, 3) \
+                   + 1.200006159 * math.pow(flow_coeff, 2) \
+                   - 0.0179715162 * flow_coeff \
+                   + factor
+
+        def _gov_press_loss():
+            flow_coeff = cls.flow_coeff(design_press, design_flow, gov_throat_diam, specific_volume)
+            if series_compose == (8, 9):
+                return 0.0486201 * math.pow(flow_coeff, 3) \
+                       - 0.00904913 * math.pow(flow_coeff, 2) \
+                       + 0.110968943 * flow_coeff \
+                       - 0.000207105545
+            elif series_compose == (5, 9):
+
+                specific_enthalphy = cls.specific_enthalphy(design_press, design_temp)
+                stop_after_specific_volumne = cls.specific_volume(design_press*(1-0.015), specific_enthalphy)
+                gov_limit_flow = 0.667 \
+                                 * (math.pi / 4 * math.pow(gov_throat_diam / 1000, 2)) \
+                                 * math.sqrt(design_press*(1-0.015) * 1000000 / stop_after_specific_volumne)
+                gov_front_after_press_specific = min(20.678743 * math.pow(design_flow / 3600 / gov_limit_flow, 6)
+                                                     - 53.426156 * math.pow(design_flow / 3600 / gov_limit_flow, 5)
+                                                     + 55.151147 * math.pow(design_flow / 3600 / gov_limit_flow, 4)
+                                                     - 28.7361 * math.pow(design_flow / 3600 / gov_limit_flow, 3)
+                                                     + 7.713955 * math.pow(design_flow / 3600 / gov_limit_flow, 2)
+                                                     - 1.029198 * (design_flow / 3600 / gov_limit_flow) + 1.050701
+                                                     , 1)
+
+                return (design_press*(1-0.015) - (gov_front_after_press_specific*design_press*(1-0.015))) / design_press*(1-0.015)
+
+            else:
+                assert len(series_compose) == 1
+                if series_compose[0] in [1, 2]:
+                    return 0.0486201 * math.pow(flow_coeff, 3)\
+                           - 0.00904913 * math.pow(flow_coeff, 2)\
+                           + 0.110968943 * flow_coeff\
+                           - 0.000207105545
+                elif series_compose[0] == 3:
+                    return 0.055735 * math.pow(flow_coeff, 3)\
+                           + 0.046289 * math.pow(flow_coeff, 2)\
+                           + 0.106104 * flow_coeff\
+                           - 0.0000682354
+                elif series_compose[0] == 4:  # ?? 需要算吗
+                    return 2.46741453 * math.pow(flow_coeff, 3) \
+                           - 1.23069257 * math.pow(flow_coeff, 2) \
+                           + 0.47302889 * flow_coeff \
+                           - 0.002228355
+                else:
+                    raise Exception('any thing missing?')
+
+        specific_volume = cls.specific_volume(design_temp, design_press)
+        if stop_throat_diam is None:  # 8 series only
+            return _gov_press_loss()
+        else:
+            return _stop_press_loss() + _gov_press_loss()
 
     @classmethod
     def flow_coeff(cls,
@@ -258,3 +434,17 @@ class FuncCollections:
                          stop_diam: float):
         specific_volume = cls.specific_volume(design_temp, design_press)
         return math.sqrt(stop_flow * 4 * 3600 * specific_volume / (stop_diam / 1000) / math.pi)
+
+    @classmethod
+    def stop_flow(cls):
+        pass
+
+
+class ClassFactory:
+
+    @classmethod
+    def compose_product_class(cls):
+        def __init(self, gov_product, stop_product):
+            self.gov_product = gov_product
+            self.stop_product = stop_product
+        return type('ComposeProduct', (), {'__init__': __init})

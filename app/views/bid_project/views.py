@@ -38,7 +38,7 @@ def projects_brief_info(project_id: int = None):
 
 @bid_project.route('/bid_project/<int:project_id>/matches')
 def query_matches(project_id: int):
-    return_code, data = BidProjectManager.get_matches()
+    return_code, data = BidProjectManager.get_matches(project_id)
     return json_response(200, code=return_code.value, data=data)
 
 @bid_project.route('/bid_projects/<int:project_id>/form_data', methods= ['GET'])

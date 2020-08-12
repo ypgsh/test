@@ -208,7 +208,25 @@ class Temperature(Base):
 
 
 class ValveProductSchema(marshmallow.Schema):
-    pass
+    class Meta:
+        fields =('model_id', 'model_version', 'series_id', 'cad_status', 'press_class', 'temp_class',
+                 'design_press', 'design_temp', 'shape_id', 'casing_mat_name', 'stem_mat_name',
+                 'fluid_medium_name', 'gov_mode', 'install_mode', 'act_oil_press_mode', 'pilot_speedup',
+                 'act_conn_type', 'cost_level', 'total_weight', 'industry', 'dwg_id', 'turbine_unit_ids',
+                 'description', 'comments', 'used', 'stop_throat_diam', 'gov_throat_diam', 'ovld_throat_diam',
+                 'stop_stem_lift', 'stop_stem_lift_main', 'stop_stem_lift_eql', 'gov_stem_lift', 'ovld_stem_lift',
+                 'cv_calc', 'cv', 'feature_size_a', 'feature_size_b', 'feature_size_c', 'feature_size_d',
+                 'feature_size_e_l', 'out_conn_type')
+
+
+class ValveProduct58Schema(marshmallow.Schema):
+    class Meta:
+        fields = ('model_id', 'model_version', 'series_id', 'cad_status', 'press_class', 'temp_class',
+                  'design_press', 'design_temp', 'shape_id', 'casing_mat_name', 'stem_mat_name',
+                  'fluid_medium_name', 'gov_mode', 'install_mode', 'act_oil_press_mode', 'pilot_speedup',
+                  'act_conn_type', 'cost_level', 'total_weight', 'industry', 'dwg_id', 'turbine_unit_ids',
+                  'description', 'comments', 'used', 'equiv_diam', 'gov_num', 'lever_num', 'gov_throat_diams',
+                  'gov_stem_empty_lifts', 'gov_stem_max_lifts', 'servo_max_lifts')
 
 class TemperatureSchema(marshmallow.Schema):
     # validate
