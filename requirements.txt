@@ -33,3 +33,5 @@ tabulate==0.8.7
 urllib3==1.25.10
 Werkzeug==1.0.1
 gunicorn==19.9.0
+gevent==1.4.0
+greenlet==0.4.15
