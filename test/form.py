@@ -89,6 +89,7 @@ class ApiTest(unittest.TestCase):
         resp = self.client.get(get_form_attr_url)
         assert resp.status_code == 200
 
+
     def _form_render(self):
         get_page_forms_render_url = '/api/sec_valve/v1/form_render'
         query_string = '&'.join([f'{key}={value}' for key, value in form_data.GET_PAGE_FORMS_ARGS.items()])

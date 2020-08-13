@@ -31,6 +31,7 @@ CREATE_FORM_ATTR={
                     "widget":  "drop_list",
                     "editable": True
                     },
+
     "dependent_attrs": ["gov_model"]
 }
 

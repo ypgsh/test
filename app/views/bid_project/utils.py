@@ -10,7 +10,11 @@ from app.models.base_data import ValveProducts, ValveProducts58, ValveProductSch
 
 from app.views.utils import ReturnCode
 
+<<<<<<< HEAD
 from app.views.forms.utils import FormManager, AttributeManager
+=======
+from app.views.forms.utils import FormManager
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
 
 PROJECT_BRIEF_INFO_KEYS = ['name', "status", "director", "update_time"]
 
@@ -33,7 +37,11 @@ class BidProjectManager:
             task_objs = total_objs
         total_num = len(total_objs)
         pages = math.ceil(total_num / per_page) if per_page else 1
+<<<<<<< HEAD
         data = BidProjectSchema().dump(task_objs, many=True)
+=======
+        data = BidProjectSchema().dump(task_objs, many=True).data
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
         return ReturnCode.SUCCESS, dict(projects=data,
                                         total_num=total_num,
                                         pages=pages
@@ -42,14 +50,22 @@ class BidProjectManager:
     @classmethod
     def get_project_brief(cls, project_id: int):
         template = {
+<<<<<<< HEAD
             "basic_info": ['project_name', 'project_status', 'project_desc', 'creator'],
+=======
+            "basic_info": ['name', 'status', 'desc'],
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
             "turbine_unit_info": ['design_press', 'design_temp', 'design_flow', 'velocity_range'],
             "valve_info": ['series_id', 'model_id', 'model_version']
         }
         obj = BidProject.get(project_id)
+<<<<<<< HEAD
         data = BidProjectSchema().dump(obj)
         attrs_dict = cls.get_attrs_info()
 
+=======
+        data = BidProjectSchema().dump(obj).data
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
         result = dict(basic_info=data,
                       turbine_unit_info=dict([(key, obj.data.get(key)) for key in template['turbine_unit_info']]),
                       valve_info=dict(series_id=obj.data.get('series_id'),
@@ -59,12 +75,15 @@ class BidProjectManager:
         return ReturnCode.SUCCESS, result
 
     @classmethod
+<<<<<<< HEAD
     def get_attrs_info(cls) -> dict:
         _, attrs = AttributeManager.get_attributes()
         attr_dict = dict([(d['name'], d['cn_name']) for d in attrs])
         return attr_dict
 
     @classmethod
+=======
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
     def modify_project_data(cls, project_id, **kwargs):
         obj = BidProject.get(project_id)
         obj.data.update(kwargs)
@@ -85,7 +104,10 @@ class BidProjectManager:
         project_data = project_obj.data
         result = dict([(name, project_data.get(name)) for name in attr_names])
         return ReturnCode.SUCCESS, result
+<<<<<<< HEAD
 
+=======
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
     @classmethod
     def if_need_series_compose(cls, project_id) -> True:
         project_obj = BidProject.get(project_id)

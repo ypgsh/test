@@ -8,11 +8,16 @@ bid_project = Blueprint('bid_project', __name__)
 
 
 @bid_project.route('/bid_project', methods= ['POST'])
+<<<<<<< HEAD
 @jwt_authorize_required()
 def create_project():
     args = request.get_json()
     user_id = g.user_id
     args.update(dict(creator=user_id))
+=======
+def create_project():
+    args = request.get_json()
+>>>>>>> b6350e2f060c15f6f8e70c0bf2fdf6e47fb496df
     return_code, data = BidProjectManager.create_project(**args)
     return json_response(201, code=return_code.value, data=data)
 

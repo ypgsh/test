@@ -6,6 +6,7 @@ import logging
 from typing import Optional
 from collections import  defaultdict
 
+
 from flask import current_app
 
 from app.views.utils import ReturnCode
@@ -51,6 +52,7 @@ class FormManager:
         return ReturnCode.SUCCESS, form_renders
 
     @classmethod
+
     def add_attr(cls, **kwargs):
         form_attr_obj = cls.attr_db.add_record(**kwargs)
         if form_attr_obj is not None:

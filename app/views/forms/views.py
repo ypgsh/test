@@ -35,6 +35,7 @@ def get_forms():
     else:
         return json_response(400, code=return_code.value, message=data)
 
+
 @form.route('/form_render', methods=['GET'])
 def form_render():
     args = request.args
@@ -46,7 +47,6 @@ def form_render():
         return json_response(200, code=ReturnCode.SUCCESS.value, data=data)
     else:
         return json_response(400, code=return_code.value, message=data)
-
 
 
 @form.route('/forms/<int:form_id>/attr', methods=['POST'])
