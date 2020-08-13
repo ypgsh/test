@@ -86,9 +86,19 @@ class BidProjectManager:
         return False
 
     @classmethod
-    def get_matches(cls, project_id: int) -> tuple:
+    def get_matches(cls, project_id: int, **args) -> tuple:
         project_matcher = BidProjectMatcher(project_id)
-        return project_matcher.get_matches()
+        return_code, data = project_matcher.get_matches()
+        if return_code is not ReturnCode.SUCCESS:
+            return return_code, data
+        info = data['info']
+        total = len(info)
+        data['total'] = total
+        if args.get('page') and args.get('per_page'):
+            page, per_page = args.get('page'), args.get('per_page')
+            data['info']=info[page*per_page:(page + 1) * per_page]
+
+        return return_code, data
 
 
 from collections import namedtuple
@@ -165,26 +175,39 @@ class BidProjectMatcher:
             if not in_press_loss_range_products:
                 return ReturnCode.FAILURE, 'not suitable stop_throat_diam'
 
-            # 计算平均流速
-            _ = [setattr(obj, 'single_velocity', FuncCollections.single_velocity(
+            # 计算单调门流速
+            _ = [setattr(obj, 'single_gov_velocity', FuncCollections.single_velocity(
                 self._data['design_temp'],
                 self._data['design_press'],
                 self._data['design_flow'],
-                obj.gov_throat_diam,  # 5 8 系列的话就没有
+                obj.gov_throat_diam,
             ))
                  for obj in in_press_loss_range_products]
 
-            # 计算平均流速
-            _ = [setattr(obj, 'single_velocity', FuncCollections.single_velocity(
-                self._data['design_temp'],
-                self._data['design_press'],
-                self._data['design_flow'],
-                obj.gov_throat_diam,  # 5 8 系列的话就没有
-            ))
+            # 计算主门流速
+            _ = [setattr(obj, 'stop_velocity', FuncCollections.stop_velocity(
+                                                                            self._data['design_temp'],
+                                                                            self._data['design_press'],
+                                                                            self._data['design_flow'],
+                                                                            obj.stop_throat_diam))
+                 if self._data['series'] != 3 else  # 3 series stop_flow = design_flow * 2
+                 setattr(obj, 'stop_velocity', FuncCollections.single_velocity(
+                                                                         self._data['design_temp'],
+                                                                         self._data['design_press'],
+                                                                         self._data['design_flow'] * 2,
+                                                                         obj.stop_throat_diam
+                                                                     ))
                  for obj in in_press_loss_range_products]
 
-            data = ValveProductSchema().dump(in_press_loss_range_products, many=True)
-            return ReturnCode.SUCCESS, data
+            # data = ValveProductSchema().dump(in_press_loss_range_products, many=True)
+            data = [dict(ValveProductSchema().dump(o),
+                         **{"stop_throat_velocity": o.stop_velocity,
+                            "gov_throat_velocity": o.single_gov_velocity}
+                         )
+                    for o in in_press_loss_range_products]
+
+            return ReturnCode.SUCCESS, dict(table_type=1,
+                                             info=data)
         else: # series 58
             equiv_diam_max = FuncCollections.equiv_diam(self._data['design_temp'],
                                                          self._data['design_press'],
@@ -223,13 +246,16 @@ class BidProjectMatcher:
                 ComposeProduct = ClassFactory.compose_product_class()
                 compose_products = [ComposeProduct(*compose) for compose in products_compose]
                 # 计算压损
-                _ = [setattr(obj, 'press_loss', FuncCollections.press_loss(
-                    self._data['design_temp'],
-                    self._data['design_press'],
-                    self._data['design_flow'],
-                    obj.stop_product.stop_throat_diam,  # 5 8 系列的话就没有
-                    obj.gov_product.equiv_diam,
-                    (self._data['series_id'], 9)))
+                _ = [setattr(obj,
+                             'press_loss',
+                             FuncCollections.press_loss(
+                                            self._data['design_temp'],
+                                            self._data['design_press'],
+                                            self._data['design_flow'],
+                                            obj.stop_product.stop_throat_diam,  # 5 8 系列的话就没有
+                                            obj.gov_product.equiv_diam,
+                                            (self._data['series_id'], 9))
+                             )
                      for obj in compose_products]
                 # 压损筛选
                 in_press_loss_range_products = [obj for obj in product_objs
@@ -238,17 +264,33 @@ class BidProjectMatcher:
                                                 ]
 
                 # 计算平均流速
-                _ = [setattr(obj, 'average_velocity', FuncCollections.average_velocity(
+                _ = [setattr(obj,
+                             'average_velocity',
+                             FuncCollections.average_velocity(
+                                                            self._data['design_temp'],
+                                                            self._data['design_press'],
+                                                            self._data['design_flow'],
+                                                            obj.gov_product.equiv_diam
+                                )
+                             )
+                     for obj in in_press_loss_range_products]
+
+                # 计算主门流速
+                _ = [setattr(obj, 'stop_velocity', FuncCollections.stop_velocity(
                     self._data['design_temp'],
                     self._data['design_press'],
                     self._data['design_flow'],
-                    obj.gov_product.equiv_diam,
-                ))
+                    obj.stop_product.stop_throat_diam))
                      for obj in in_press_loss_range_products]
 
-                data = [ValveProduct58Schema().dump(obj.gov_product).update(ValveProductSchema().dump(obj.stop_product))
+                data = [dict(ValveProduct58Schema().dump(obj.gov_product),
+                             **{"stop_throat_velocity": obj.stop_velocity,
+                             "gov_throat_velocity": obj.average_velocity,
+                             'supply_model_info': ValveProductSchema().dump(obj.stop_product)}
+                             )
                         for obj in in_press_loss_range_products]
-                return ReturnCode.SUCCESS, data
+                return ReturnCode.SUCCESS, dict(table_type=2,
+                                             info=data)
             else: # 8 series only
                 # 计算压损
                 _ = [setattr(obj, 'press_loss', FuncCollections.press_loss(
@@ -275,8 +317,15 @@ class BidProjectMatcher:
                     obj.equiv_diam,
                     ))
                      for obj in in_press_loss_range_products]
-                data = ValveProduct58Schema().dump(in_press_loss_range_products, many=True)
-                return ReturnCode.SUCCESS, data
+
+                # 不用计算主门流速
+
+                data = [dict(ValveProduct58Schema().dump(obj.gov_product),
+                             **{ "gov_throat_velocity": obj.average_velocity}
+                             )
+                        for obj in in_press_loss_range_products]
+                return ReturnCode.SUCCESS, dict(table_type=3,
+                                                info=data)
 
 
 
@@ -404,7 +453,7 @@ class FuncCollections:
                     raise Exception('any thing missing?')
 
         specific_volume = cls.specific_volume(design_temp, design_press)
-        if stop_throat_diam is None:  # 8 series only
+        if stop_throat_diam is None:  # 8 series only or 4 series
             return _gov_press_loss()
         else:
             return _stop_press_loss() + _gov_press_loss()
