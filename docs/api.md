@@ -370,32 +370,41 @@ method: GET
 {
     "api_standard": "1.0",
     "code":0,
-    "data": [
-         {
-            "model_id": "VSL-165-130-12-05-50",
-            "model_version": "00",
-            "stop_throat_diam": 60,  # 主门口径
-            "gov_throat_diam": 60, # 调门口径
-            "press_loss": 2.1  #阀门压损
-            "press_level": 110 # 压力等级
-            "temp_level": 110 # 温度等级
-            "series_id": 2 # 阀门系列
-            "design_press": 5 # 设计压力
-            "design_temp": 500 # 设计温度
-            "casing_mat_name": "2G15CR" # 阀壳材料
-            "stem_mat_name": "22cR12N" # 阀杆材料
-            "total_weight": 20 # 总重
-            "stop_throat_velocity": 13 # 主门流速
-            "gov_throat_velocity": 14 # 调门流速
-            "velocity_mode": "阀门平均流速"
-         }
-    ]
+    "data": {
+    
+        "table_type": 1,
+        "total": 20,
+        "info":[
+                     {
+                        "model_id": "VSL-165-130-12-05-50",
+                        "model_version": "00",
+                        "stop_throat_diam": 60,  # 主门口径
+                        "gov_throat_diam": 60, # 调门口径
+                        "press_loss": 2.1  #阀门压损
+                        "press_level": 110 # 压力等级
+                        "temp_level": 110 # 温度等级
+                        "series_id": 2 # 阀门系列
+                        "design_press": 5 # 设计压力
+                        "design_temp": 500 # 设计温度
+                        "casing_mat_name": "2G15CR" # 阀壳材料
+                        "stem_mat_name": "22cR12N" # 阀杆材料
+                        "total_weight": 20 # 总重
+                        "stop_throat_velocity": 13 # 主门流速
+                        "gov_throat_velocity": 14 # 调门流速
+                        "velocity_mode": "阀门平均流速"
+                     }
+                ]
+                }
 }
 或 (5,8系列配套9场景)
 {
     "api_standard": "1.0",
     "code":0,
-    "data": [
+    "data": {
+    
+        "table_type": 2,
+        "total": 20,
+        "info":[
          {
             "model_id": "VSL-165-130-12-05-50-00", # 主门型号        
             "gov_model_id": "VSL-165-130-12-05-50-00", # 调门型号    
@@ -423,12 +432,16 @@ method: GET
                 }
          }
     ]
-}
+}}
 或 (5,8系列不配套9场景)
 {
     "api_standard": "1.0",
     "code":0,
-    "data": [
+    "data": {
+    
+        "table_type": 3,
+        "total": 20,
+        "info":[
          {
             "model_id": "VSL-165-130-12-05-50-00",
             "equiv_throat_diam": 60,  # 当量口径
@@ -445,7 +458,7 @@ method: GET
             "gov_throat_velocity": 14 # 调门流速
          }
     ]
-}
+}}
 ```
 
 ## 1.8 保存预选型号/保存推荐型号
